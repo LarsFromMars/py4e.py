@@ -1,25 +1,28 @@
-# File reads a url :  http://py4e-data.dr-chuck.net/comments_1276630.html
-# And sums up the values in the span tag "Contents: "
-
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
+import json
 import ssl
+import urllib.error
+import urllib.parse
+import urllib.request
 
 # Ignore SSL certificate errors
 ctx = ssl.create_default_context()
 ctx.check_hostname = False
 ctx.verify_mode = ssl.CERT_NONE
 
-url = input('Enter - ')
-html = urlopen(url, context=ctx).read()
-soup = BeautifulSoup(html, "html.parser")
+# url = input('Enter Location: ')
+url = "http://py4e-data.dr-chuck.net/comments_42.json"
+uh = urllib.request.urlopen(url, context=ctx)
+data = uh.read().decode()
+print('Retrieving', url)
+print('Retrieved', len(data), 'characters')
+js = json.loads(data)
 
-# Retrieve all of the spans
-spans = soup('span')
+num = 0
 total = 0
-for nums in spans:
-    # Look at the parts of a span and put index 0 in num
-    num = int(nums.contents[0])
-    total += num
-print(total)
-
+for _ in js:
+    num += int(js['comments'][0]['count'])
+    print(num)
+    total += 1
+print(js)
+print("Count: ", total)
+print("Sum: ", num)
